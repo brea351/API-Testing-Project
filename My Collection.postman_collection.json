@@ -1,0 +1,546 @@
+{
+  "info": {
+    "_postman_id": "6547dd12-3220-488f-8ffc-6c539cc01611",
+    "name": "My Collection",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51757486",
+    "_collection_link": "https://go.postman.co/collection/51757486-6547dd12-3220-488f-8ffc-6c539cc01611?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Regression Tests",
+      "item": [
+        {
+          "name": "Smoke Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.expect(pm.response.code).to.eql(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is acceptable\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is valid JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"API returned product data\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"data\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://api.freeapi.app/api/v1/public/randomproducts",
+              "protocol": "https",
+              "host": [
+                "api",
+                "freeapi",
+                "app"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "randomproducts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Functional Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. Validate successful response\r",
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// 2. Functional Check: Parameter Reflection\r",
+                  "pm.test(\"API correctly captures 'query' parameter\", () => {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    // Validate that the server received our 'phone' query\r",
+                  "    pm.expect(jsonData.args.query).to.eql(\"phone\");\r",
+                  "});\r",
+                  "\r",
+                  "// 3. Functional Check: Limit Validation\r",
+                  "pm.test(\"API correctly captures 'limit' parameter\", () => {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    // Validate that the server received our limit of 5\r",
+                  "    pm.expect(jsonData.args.limit).to.eql(\"5\");\r",
+                  "});\r",
+                  "\r",
+                  "// 4. Header Validation (Crucial for Functional QA)\r",
+                  "pm.test(\"Request used correct Host header\", () => {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.headers.host).to.eql(\"postman-echo.com\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://postman-echo.com/get?query=phone&limit=5",
+              "protocol": "https",
+              "host": [
+                "postman-echo",
+                "com"
+              ],
+              "path": [
+                "get"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "phone"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Integration Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. Status Check\r",
+                  "pm.test(\"Producer: Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// 2. Integration Logic: Extract and Save Data\r",
+                  "pm.test(\"Integration: Data extracted for next request\", () => {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    const capturedUser = jsonData.args.username;\r",
+                  "    \r",
+                  "    // Save this to a variable so Request #2 can see it\r",
+                  "    pm.collectionVariables.set(\"saved_username\", capturedUser);\r",
+                  "    \r",
+                  "    pm.expect(pm.collectionVariables.get(\"saved_username\")).to.eql(\"TosinQA\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://postman-echo.com/get?username=TosinQA",
+              "protocol": "https",
+              "host": [
+                "postman-echo",
+                "com"
+              ],
+              "path": [
+                "get"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "TosinQA"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Integration Test 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1. Status Check\r",
+                  "pm.test(\"Consumer: Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// 2. Integration Check: Verify data was passed correctly\r",
+                  "pm.test(\"Integration: Request #2 received data from Request #1\", () => {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    const receivedUser = jsonData.args.login_check;\r",
+                  "    \r",
+                  "    // Verify the data matches what we saved earlier\r",
+                  "    pm.expect(receivedUser).to.eql(pm.collectionVariables.get(\"saved_username\"));\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://postman-echo.com/get?login_check={{saved_username}}",
+              "protocol": "https",
+              "host": [
+                "postman-echo",
+                "com"
+              ],
+              "path": [
+                "get"
+              ],
+              "query": [
+                {
+                  "key": "login_check",
+                  "value": "{{saved_username}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public APIs-Smoke Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "\r",
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.eql(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is acceptable\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is valid JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API returned product data\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"data\");\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.freeapi.app/api/v1/public/randomproducts",
+          "protocol": "https",
+          "host": [
+            "api",
+            "freeapi",
+            "app"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "public",
+            "randomproducts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Public APIs-Functional Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 1. Validate successful response\r",
+              "pm.test(\"Status code is 200\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// 2. Functional Check: Parameter Reflection\r",
+              "pm.test(\"API correctly captures 'query' parameter\", () => {\r",
+              "    const jsonData = pm.response.json();\r",
+              "    // Validate that the server received our 'phone' query\r",
+              "    pm.expect(jsonData.args.query).to.eql(\"phone\");\r",
+              "});\r",
+              "\r",
+              "// 3. Functional Check: Limit Validation\r",
+              "pm.test(\"API correctly captures 'limit' parameter\", () => {\r",
+              "    const jsonData = pm.response.json();\r",
+              "    // Validate that the server received our limit of 5\r",
+              "    pm.expect(jsonData.args.limit).to.eql(\"5\");\r",
+              "});\r",
+              "\r",
+              "// 4. Header Validation (Crucial for Functional QA)\r",
+              "pm.test(\"Request used correct Host header\", () => {\r",
+              "    const jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.headers.host).to.eql(\"postman-echo.com\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://postman-echo.com/get?query=phone&limit=5",
+          "protocol": "https",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "get"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "phone"
+            },
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Public APIs-Integration Test(Request1)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 1. Status Check\r",
+              "pm.test(\"Producer: Status code is 200\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// 2. Integration Logic: Extract and Save Data\r",
+              "pm.test(\"Integration: Data extracted for next request\", () => {\r",
+              "    const jsonData = pm.response.json();\r",
+              "    const capturedUser = jsonData.args.username;\r",
+              "    \r",
+              "    // Save this to a variable so Request #2 can see it\r",
+              "    pm.collectionVariables.set(\"saved_username\", capturedUser);\r",
+              "    \r",
+              "    pm.expect(pm.collectionVariables.get(\"saved_username\")).to.eql(\"TosinQA\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://postman-echo.com/get?username=TosinQA",
+          "protocol": "https",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "get"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "TosinQA"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Public APIs-Integration Test(Request2)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 1. Status Check\r",
+              "pm.test(\"Consumer: Status code is 200\", () => {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// 2. Integration Check: Verify data was passed correctly\r",
+              "pm.test(\"Integration: Request #2 received data from Request #1\", () => {\r",
+              "    const jsonData = pm.response.json();\r",
+              "    const receivedUser = jsonData.args.login_check;\r",
+              "    \r",
+              "    // Verify the data matches what we saved earlier\r",
+              "    pm.expect(receivedUser).to.eql(pm.collectionVariables.get(\"saved_username\"));\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://postman-echo.com/get?login_check={{saved_username}}",
+          "protocol": "https",
+          "host": [
+            "postman-echo",
+            "com"
+          ],
+          "path": [
+            "get"
+          ],
+          "query": [
+            {
+              "key": "login_check",
+              "value": "{{saved_username}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "saved_username",
+      "value": ""
+    }
+  ]
+}
